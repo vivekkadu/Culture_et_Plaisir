@@ -1,0 +1,51 @@
+Hello Sir,
+
+Please check Update for Quiz App
+
+Quiz App Update
+
+Task Done:
+
+
+  3rd Update (29th July 2019)
+
+  1. Check for new topic and new questions added ,save to local database
+  2. Setting Screen
+  3. Result Screen : Share With Option 
+
+  2nd Update: (24th July 2019)
+
+  1. HomeScreen : Displaying Progress of Topic with Pie chart
+  2. About Screen
+  3. Test Mixte: Mix Que Test
+  4. ResultScreen:
+        a)filters like all correct ans/ wrong ans etc.
+        b) Displaying wrong answer selected by user
+        c) Share with Option
+  5. Category Screen : Removing Mix Test Questions
+  6. Remove questions from Mix test which are attended in Topic Wise Test
+
+
+  1st Update: (19th July 2019)
+
+  1. Rendering Topics for Quiz on HomeScreen
+  2. Selecting Questions range for topic
+  3. Storing Topics and Questions in Local Database
+  4. Rendering Questions in Test
+  5. Highlighting Right answer in test
+  6. Maintaining Timer in Test
+  7. Maintaining Topic progress of user in local database
+  8. ResultScreen :
+   a) Displaying Test Score, Time and Status of Result : passed or Failed
+   b) complete list of questions solved by user with explanation and correct_answer (Displaying user wrong answer have to done)
+
+
+
+
+App APK File Link: https://i.diawi.com/vPRXeg
+
+
+
+
+
+

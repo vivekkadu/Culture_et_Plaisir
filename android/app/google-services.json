@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "510112600118",
+    "firebase_url": "https://culture-et-plaisir.firebaseio.com",
+    "project_id": "culture-et-plaisir",
+    "storage_bucket": "culture-et-plaisir.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:510112600118:android:a4a247de676f2542",
+        "android_client_info": {
+          "package_name": "com.culture_et_plaisir"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "510112600118-7nqobvo4gcn793qu7kp8l4t1jp65tfvf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIgEdbotHFOZu1uJLETo3n0A0CBQznwp8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "510112600118-7nqobvo4gcn793qu7kp8l4t1jp65tfvf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
