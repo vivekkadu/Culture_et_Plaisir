@@ -6,7 +6,8 @@ export const Topics = {
      name: 'string',
      description: 'string',
      content: 'string',
-     total_que: {type: 'int', default: 0 }
+     total_que: {type: 'int', default: 0 },
+     icons: 'string'
 
    }
 };

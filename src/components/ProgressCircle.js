@@ -23,7 +23,7 @@ export default class ProgressCircle extends Component {
     }
 
   renderPer(progress){
-    if(isNaN(progress)){
+    if(isNaN(progress) || progress< 0){
       return 0
     }else{
       return (progress * 100).toFixed(0)

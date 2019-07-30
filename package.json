@@ -13,6 +13,7 @@
     "lodash": "^4.17.15",
     "react": "16.8.6",
     "react-native": "0.60.3",
+    "react-native-admob": "^2.0.0-beta.5",
     "react-native-deck-swiper": "^1.6.7",
     "react-native-elements": "^1.1.0",
     "react-native-firebase": "^5.5.5",

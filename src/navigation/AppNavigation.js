@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View, Image } from 'react-native';
-import { createBottomTabNavigator, createAppContainer,createStackNavigator } from 'react-navigation';
+import { createBottomTabNavigator, createAppContainer,createStackNavigator, createSwitchNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import HomeScreen from '../Screens/HomeScreen'
 import AboutScreen from '../Screens/AboutScreen'
@@ -11,6 +11,7 @@ import SettingsScreen from '../Screens/SettingsScreen'
 import ResultScreen from '../Screens/ResultScreen'
 import MixTestScreen from '../Screens/MixTestScreen'
 import MixTestQueScreen from '../Screens/MixTestQueScreen'
+import SplashScreen from '../Screens/SplashScreen'
 import { fromLeft, zoomIn, zoomOut, fromRight } from 'react-navigation-transitions'
 
 const AppNavigation = createStackNavigator({
@@ -21,7 +22,8 @@ const AppNavigation = createStackNavigator({
     SettingsScreen: SettingsScreen,
     ResultScreen: ResultScreen,
     MixTestScreen: MixTestScreen,
-    MixTestQueScreen: MixTestQueScreen
+    MixTestQueScreen: MixTestQueScreen,
+
 },{
   headerMode: 'none',
   transitionConfig: () => fromRight(),
@@ -31,4 +33,11 @@ const AppNavigation = createStackNavigator({
   }
 })
 
-export default createAppContainer(AppNavigation);
+const AppNavigationFinal = createSwitchNavigator({
+  App: AppNavigation,
+  SplashScreen: SplashScreen
+},{
+  initialRouteName: 'SplashScreen',
+})
+
+export default createAppContainer(AppNavigationFinal);

@@ -67,7 +67,8 @@ export default class SettingsScreen extends Component {
 async removeAttemptedQue(index){
   const { navigation } = this.props
   const questions = navigation.getParam('questions')
-  var topicProgress = realm2.objects('topic_progress')
+   var topicProgress = realm2.objects('topic_progress')
+  
 
 
   if(index < questions.length){
@@ -79,20 +80,22 @@ async removeAttemptedQue(index){
     const TopicfromProgress = topicProgress.filter((item) => item.topic_id === question[0].topic_id)
 
      
-          
-      const question_attempt = TopicfromProgress[0].question_attempt
-      const topicId = TopicfromProgress[0].topic_id
-          
-      realm2.write(() => {
+    if(TopicfromProgress.length > 0){
+      const question_attempt = TopicfromProgress.pop().question_attempt
+      
+         
+   realm2.write(() => {
           realm2.create('topic_progress', {
-              topic_id: topicId,
+              topic_id: TopicId,
                 question_attempt:  question_attempt - 1 
               })
           })
             console.log("TOPIC", TopicfromProgress)
       
-
-    realm4.write(() => {
+    }
+          
+     
+   await realm4.write(() => {
       let question =  attended_que.filter((item) => item.id === id)
       console.log("new",question[0])
       realm4.delete(question[0])

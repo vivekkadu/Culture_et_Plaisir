@@ -14,6 +14,12 @@ import ProgressCircle from '../components/ProgressCircle'
 import { Topics, Questions, TopicProgress, QueAns, AttendedMixQue , AttendedQue} from '../Database/Schema'
 import _ from 'lodash'
 import firebase from 'react-native-firebase';
+import {
+  AdMobBanner,
+  AdMobInterstitial,
+  PublisherBanner,
+  AdMobRewarded,
+} from 'react-native-admob'
 
 let realm;
 let realm2;
@@ -86,7 +92,6 @@ componentDidMount(){
   this.loadAllQue()
   this.loadNextTopics()
   this.loadNextQuestions()
-  firebase.admob.initialize("ca-app-pub-6459003673906970~7269326254") ;
 
 }
 
@@ -366,7 +371,8 @@ loadTotal(){
                      name: topic.name,
                      description: topic.description,
                      content: topic.content,
-                     total_que: topic.questions.length
+                     total_que: topic.questions.length,
+                     icons: topic.icons || ''
                    })
                  })
                 })
@@ -386,13 +392,15 @@ toSetting() {
 
     const Banner = firebase.admob.Banner;
     const AdRequest = firebase.admob.AdRequest;
-    const unitId =
-    Platform.OS === 'ios'
-      ? 'ca-app-pub-6459003673906970/6423202342'
-      : 'ca-app-pub-6459003673906970/2627373668';
     const request = new AdRequest();
     request.addKeyword('foobar');
-    
+    // const unitId =
+    // Platform.OS === 'ios'
+    //   ? 'ca-app-pub-6459003673906970/6423202342'
+    //   : 'ca-app-pub-6459003673906970/2627373668';
+    const unitId = "ca-app-pub-3940256099942544/6300978111"
+     
+      
     
   
   
@@ -402,11 +410,11 @@ toSetting() {
 
           <Header navigateToSettings={() => this.toSetting()} headerText="Sujet" navigation={this.props.navigation} showSetting={true} showInfo={true}/>
 
-            <ScrollView style={{ }}>
+            <ScrollView style={{ marginBottom: "25%" }}>
             {this.state.isFetchingTopics && this.state.isFetchingAllQue ? <Spinner/> : this.state.topics.map((topic) => {
               return <TouchableOpacity onPress={() => this.props.navigation.navigate("Category", { topic: topic})}  key ={topic.id} style={styles.cardStyle}>
                         <View style={{ flexDirection: 'row'}}>
-                        <Image source={UniIcon} style={styles.iconStyle}/>
+                        <Image source={{ uri:  `data:image/png;base64,${topic.icons}`}} style={styles.iconStyle}/>
                         <Text style={styles.headingStyle}>{topic.name}</Text>
                         </View>
                       <ProgressCircle totalQue={this.state.totalQue[topic.id -  1]} progress={this.state.progressArray[topic.id -  1]}/>
@@ -416,15 +424,22 @@ toSetting() {
 
 
             </ScrollView>
-        
-            <Banner
-              unitId={unitId}
-              size={'SMART_BANNER'}
-              request={request.build()}
-              onAdLoaded={() => {
-                console.log('Advert loaded');
-              }}
-            />
+            
+            <View style={{ left: 15, marginBottom: 10, position: 'absolute', bottom: 25, alignItems: 'center', justifyContent: 'center'}}>
+            {Platform.OS === 'ios' ? <Banner
+                unitId ={unitId}
+                size={"SMART_BANNER"}
+                request={request.build()}
+                onAdLoaded={() => {
+                  console.log('Advert loaded');
+                }}
+              /> : <AdMobBanner
+                  adSize="banner"
+                  adUnitID={unitId}
+                  testDevices={[AdMobBanner.simulatorId]}
+                  onAdFailedToLoad={error => console.error(error)}
+                /> }
+            </View>
            
             <BottomTabComponent allQuestion={this.state.allQuestion} screen={"HomeScreen"} navigation={this.props.navigation}/>
 

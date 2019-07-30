@@ -3,7 +3,6 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 target 'Culture_et_Plaisir' do
   # Pods for Culture_et_Plaisir
-  pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios'
   pod 'Firebase/AdMob'
   pod 'React', :path => '../node_modules/react-native/'
   pod 'React-Core', :path => '../node_modules/react-native/React'
@@ -37,6 +36,13 @@ target 'Culture_et_Plaisir' do
   pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
 
   pod 'RNShare', :path => '../node_modules/react-native-share'
+  
+  
+  
+  
+
+
+
 
 
   target 'Culture_et_PlaisirTests' do
