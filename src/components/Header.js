@@ -81,11 +81,11 @@ export default class MyComponent extends Component {
                </TouchableOpacity>
              }
             >
-            <MenuItem textStyle={{ color: "#fff"}} onPress={() => this.props.showAllCorrect()}>Correct Answers</MenuItem>
+            <MenuItem textStyle={{ color: "#fff"}} onPress={() => this.props.showAllCorrect()}>Bonnes Réponses</MenuItem>
             <MenuDivider color={"#fff"}/>
-            <MenuItem  textStyle={{ color: "#fff"}} onPress={() => this.props.showAllWrong()}>Wrong Answers</MenuItem>
+            <MenuItem  textStyle={{ color: "#fff"}} onPress={() => this.props.showAllWrong()}>Mauvaises Réponses</MenuItem>
             <MenuDivider  color={"#fff"} />
-            <MenuItem textStyle={{ color: "#fff"}} onPress={() => this.props.openShare()}>Share With</MenuItem>
+            <MenuItem textStyle={{ color: "#fff"}} onPress={() => this.props.openShare()}>Partager avec</MenuItem>
             <MenuDivider  color={"#fff"}/>
 
           </Menu>

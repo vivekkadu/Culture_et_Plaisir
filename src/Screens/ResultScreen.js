@@ -133,7 +133,7 @@ renderUserAnswersOptions(index,que){
     return (
       <View style={styles.container}>
 
-        <Header ShowAll={() => this.showAll()} showAllWrong={() => this.showAllWrong()} showAllCorrect={() => this.showAllCorrect()} openShare={() => this.openShare(topic, score, attended_questions.length)} headerText={"Score"} showSideMenu={true}  showHome={true} navigation={this.props.navigation}/>
+        <Header ShowAll={() => this.showAll()} showAllWrong={() => this.showAllWrong()} showAllCorrect={() => this.showAllCorrect()} openShare={() => this.openShare(topic, score, attended_questions.length)} headerText={"Résultats"} showSideMenu={true}  showHome={true} navigation={this.props.navigation}/>
 
         <View style={{ backgroundColor: "#639EE4",  padding: 8}}>
 
@@ -141,9 +141,9 @@ renderUserAnswersOptions(index,que){
 
             <View style={{ margin: 10, flexDirection: 'row', justifyContent: 'space-between'}}>
 
-            <Text style={styles.textStyle}><Text style={{ fontWeight: 'bold'}}>Score:</Text> {score}/{attended_questions.length}</Text>
+            <Text style={styles.textStyle}><Text style={{ fontWeight: 'bold'}}>Résultats:</Text> {score}/{attended_questions.length}</Text>
             <Text style={styles.textStyle}><Text style={{ fontWeight: 'bold'}}>Temps:</Text> {this.formatTime(time)} Min</Text>
-            {per > 50 ? <Text style={styles.textStyle}><Text style={{ fontWeight: 'bold'}}>Status:</Text> Passed</Text> : <Text style={styles.textStyle}><Text style={{ fontWeight: 'bold'}}>Status:</Text> Failed</Text>}
+            {per > 50 ? <Text style={styles.textStyle}><Text style={{ fontWeight: 'bold'}}>Statut:</Text>Passé</Text> : <Text style={styles.textStyle}><Text style={{ fontWeight: 'bold'}}>Statut:</Text> Échoué</Text>}
             </View>
         </View>
 

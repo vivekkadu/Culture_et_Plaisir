@@ -45,6 +45,8 @@ target 'Culture_et_Plaisir' do
 
 
 
+  pod 'RNIap', :path => '../node_modules/react-native-iap'
+
   target 'Culture_et_PlaisirTests' do
     inherit! :search_paths
     # Pods for testing

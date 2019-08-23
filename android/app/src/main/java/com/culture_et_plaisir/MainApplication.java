@@ -7,6 +7,7 @@ import com.facebook.react.PackageList;
 import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
 import com.facebook.react.bridge.JavaScriptExecutorFactory;
 import com.facebook.react.ReactApplication;
+import com.dooboolab.RNIap.RNIapPackage;
 import com.sbugert.rnadmob.RNAdMobPackage;
 import cl.json.RNSharePackage;
 import io.realm.react.RealmReactPackage;
@@ -40,6 +41,7 @@ public class MainApplication extends Application implements ReactApplication {
       new RNFirebasePackage();
       new RNFirebaseAdMobPackage();
       new RNFirebaseAnalyticsPackage();
+      packages.add(new RNFirebaseAdMobPackage());
       return packages;
     }
 

@@ -131,8 +131,8 @@ android {
         applicationId "com.culture_et_plaisir"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 14082019
+        versionName "1.4.0"
         multiDexEnabled true
 
     }
@@ -190,6 +190,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-iap')
     implementation project(':react-native-admob')
     implementation project(':react-native-share')
     implementation project(':realm')

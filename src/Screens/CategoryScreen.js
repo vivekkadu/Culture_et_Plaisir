@@ -9,6 +9,7 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  AsyncStorage
 } from 'react-native';
 import  Header from '../components/Header'
 import HomeBg from '../Img/main_bg.jpg'
@@ -20,7 +21,7 @@ import axios from 'axios'
 import { Slider } from 'react-native-elements';
 import Spinner from '../components/Spinner';
 var Realm = require('realm');
-import { Topics, Questions,QueAns,TopicProgress, AttendedMixQue } from '../Database/Schema'
+import { Topics, Questions,QueAns,TopicProgress, AttendedMixQue, AttendedMixQueAll } from '../Database/Schema'
 let realm;
 let realm2;
 let realm4;
@@ -38,12 +39,13 @@ export default class CategoryScreen extends Component {
     this.state= {
       questions: [],
       topics: [],
-      isLoading: true,
+      isLoading: false,
       value: 0,
       disabled: false,
       slovedQue: 0,
       sliderProgress: 0,
-      mixQue: 0
+      mixQue: 0,
+      app_type: ''
     }
     realm = new Realm({
       path: `questions.realm`,
@@ -59,19 +61,33 @@ export default class CategoryScreen extends Component {
 
        })
 
+       realm5 = new Realm({
+        path: 'attended_mix_que_all.realm',
+        schema: [AttendedMixQueAll]
+
+      })
+
  }
 
 
- componentDidMount(){
+ async componentDidMount(){
 
 
        const { navigation } = this.props
        const topic = navigation.getParam('topic')
+       const value = await AsyncStorage.getItem('app_type');
+
+       if(value === null){
+        this.setState({ app_type: 'free'})
+       }else if(value === 'paid'){
+        this.setState({ app_type: 'paid'})
+       }
+
        var questions = realm.objects('questions')
 
        console.log("questions",questions)
 
-       var mixQue = realm4.objects('attended_mix_questions')
+       var mixQue = realm5.objects('attended_mix_questions_all')
        var mixQueTopic = mixQue.filter((item) => item.topic_id === topic.id )
 
 
@@ -87,14 +103,22 @@ export default class CategoryScreen extends Component {
 
 
         if(filterData.length > 0){
-          this.setState({ questions: RealQue, isLoading: false })
+          if(value === null ){
+            this.setState({ questions: RealQue.slice(0,30), isLoading: false })
+          }else if(value === 'paid'){
+            this.setState({ questions: RealQue, isLoading: false })
+          }
         }else{
           axios.get("http://112.196.16.90:8080/Culture/api/get_topics_questions/")
               .then(response => {
                 if(response.data.status == 200){
                  this.setState({ topics: response.data.topics , isLoading: false})
                  let currentTopic = response.data.topics.filter((item) => item.id == topic.id)
-                 this.setState({ questions: currentTopic[0].questions})
+                 if(value === null || value === 'free' ){
+                  this.setState({ questions: currentTopic[0].questions.slice(0,30), isLoading: false })
+                }else if(value === 'paid'){
+                  this.setState({ questions: currentTopic[0].questions, isLoading: false })
+                }
 
                  currentTopic[0].questions.map((que) => {
                    realm.write(() => {
@@ -128,6 +152,13 @@ export default class CategoryScreen extends Component {
 
         if(progress.length > 0 ){
             this.setState({ solvedQue: progress.pop() })
+               
+         }
+
+         if(value === null || value === 'free'){
+           if(this.state.solvedQue === 30){
+             this.setState({ hideSlider: true })
+           }
          }
 
 
@@ -153,7 +184,7 @@ export default class CategoryScreen extends Component {
                  <ScrollView style={{ flex: 1, marginBottom: "11%" }}>
 
                  <Text style={{ margin: 12 , fontSize: 16, color: '#fff', fontWeight: 'bold'}}>
-                  Ce suject traite
+                  Ce sujet traite
                  </Text>
 
                 {descriptionArray.map((item, index) => {
@@ -166,30 +197,34 @@ export default class CategoryScreen extends Component {
 
 
                    <ImageBackground source={TotalBg} style={{ marginTop: 25, margin: 10, padding: 10, justifyContent: 'center', alignItems: 'center'}}>
-                    <Text style={{ color: '#fff', fontWeight: 'bold', marginBottom: 5}}>Questions Posees dans le test mixte {this.state.mixQue} </Text>
-                    <Text style={{ color: "#fff", fontSize: 24, fontWeight: 'bold'}}>Questions Totals {(this.state.questions.length)  - (this.state.solvedQue || 0) } </Text>
+                    <Text style={{ color: '#fff', fontWeight: 'bold', marginBottom: 5}}>Questions Posées dans le texte mixte {this.state.mixQue} </Text>
+                    <Text style={{ color: "#fff", fontSize: 24, fontWeight: 'bold'}}>Questions Totales {(this.state.questions.length)  - (this.state.solvedQue || 0) } </Text>
                   </ImageBackground>
 
 
                  <Text style={{ marginTop: "7%",  alignSelf: 'center', color : "#fff", fontSize: 16}}>Choisir le nombre de questions: {this.state.value - this.state.solvedQue < 0 ?  0 : this.state.value - (this.state.solvedQue || 0) }</Text>
 
 
-                  <View style={{ marginTop: "5%"}}>
+               <View style={{ marginTop: "5%"}}>
 
-                  <Slider
-                   value ={this.state.value}
-                    minimumTrackTintColor={"#2B57B7"}
-                    maximumTrackTintColor={"#fff"}
-                    style={{ margin: 10 }}
-                    minimumValue= {this.state.solvedQue  || 0 }
-                    step={1}
-                    onValueChange={(value) => this.setState({ value: value })}
-                    thumbStyle={{ backgroundColor: '#2B57B7', borderColor: "#D4D4D4", borderWidth: 3, height: 40, width: 40, borderRadius: 20}}
-                    trackStyle={{ height: 12, margin: 10, borderRadius: 5 }}
-                    maximumValue={this.state.questions.length }
-                    thumbTintColor={"#2B57B7"}
-                  />
-                  </View>
+                 {(this.state.solvedQue >= 30 && this.state.app_type === "free") || (this.state.solvedQue >= this.state.questions.length && this.state.app_type === "paid") ? <Text style={{ color: '#fff', alignSelf: 'center', fontSize: 16, marginTop: 5, margin: 5, textAlign: 'center' }}>Ont répondu à toutes les questions sur le sujet</Text> :  <Slider
+                    value ={this.state.value}
+                      minimumTrackTintColor={"#2B57B7"}
+                      maximumTrackTintColor={"#fff"}
+                      style={{ margin: 10 }}
+                      minimumValue= {this.state.solvedQue || 0 }
+                      step={1}
+                      onValueChange={(value) => this.setState({ value: value })}
+                      thumbStyle={{ backgroundColor: '#2B57B7', borderColor: "#D4D4D4", borderWidth: 3, height: 40, width: 40, borderRadius: 20}}
+                      trackStyle={{ height: 12, margin: 10, borderRadius: 5 }}
+                      maximumValue={this.state.questions.length }
+                      thumbTintColor={"#2B57B7"}
+                    /> }
+
+                    
+                   
+                    </View> 
+                 
 
                   </ScrollView>
 

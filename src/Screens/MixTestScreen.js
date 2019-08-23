@@ -65,7 +65,7 @@ export default class MixTestScreen extends Component {
         <Header headerText="Test Mixte" />
 
         <View style={{ marginTop: 25, margin: 10, padding: 5, justifyContent: 'center', alignItems: 'center'}}>
-         <Text style={{ color: "#fff", fontSize: 24, fontWeight: 'bold'}}>Questions Totals {questions.length} </Text>
+         <Text style={{ color: "#fff", fontSize: 24, fontWeight: 'bold'}}>Questions Totales {questions.length} </Text>
        </View>
 
        <Text style={{ marginTop: "7%",  alignSelf: 'center', color : "#fff", fontSize: 16}}>Choisir le nombre de questions: {this.state.value}</Text>

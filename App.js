@@ -15,7 +15,7 @@ import { Provider } from 'react-redux';
 let store = createStore(app, applyMiddleware(thunk))
 
 const App = () => {
-   console.disableYellowBox = true;
+  //  console.disableYellowBox = true;
   return (
       <SafeAreaView style={{ flex: 1 , backgroundColor:"#639EE4" }}>
         <StatusBar backgroundColor="#639EE4" barStyle="light-content"/>

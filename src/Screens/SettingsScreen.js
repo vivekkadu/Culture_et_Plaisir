@@ -8,7 +8,10 @@ import {
   ImageBackground,
   Button,
   TouchableOpacity,
-  Platform
+  Platform,
+  AsyncStorage,
+  Alert,
+  Linking
 } from 'react-native';
 import Header from '../components/Header'
 import HomeBg from '../Img/main_bg.jpg'
@@ -17,7 +20,28 @@ import ResetButton from '../Img/button_grey.png'
 import BackButton from '../Img/button_blue.png'
 import Swiper from 'react-native-deck-swiper'
 import Realm from 'realm'
+import RNIap, {
+  Product,
+  ProductPurchase,
+  acknowledgePurchaseAndroid,
+  purchaseUpdatedListener,
+  purchaseErrorListener,
+  PurchaseError,
 
+} from 'react-native-iap';
+import { ScrollView } from 'react-native-gesture-handler';
+import Spinner from '../components/Spinner';
+
+
+
+const itemSkus = Platform.select({
+  ios: [
+    'com.culture.et.plaisir'
+  ],
+  android: [
+    'com.culture.et.plaisir'
+  ]
+});
 
 export default class SettingsScreen extends Component {
 
@@ -31,7 +55,10 @@ export default class SettingsScreen extends Component {
       pagination: 7,
       cardIndex: 0,
       showSwiper: false,
-      array: questions.map((item) => item.question)
+      array: questions.map((item) => item.question),
+      showRemoveAd: true,
+      products: [],
+      loading: false
     }
 
 
@@ -56,15 +83,56 @@ export default class SettingsScreen extends Component {
     
   }
 
-  componentDidMount(){
+  getProduct = async () =>{
+
+
+    try {
+      const products = await RNIap.getProducts(itemSkus);
+     
+      console.log("Products")
+        console.log(products)
+
+        this.setState({ products })
+        this.setState({isLoading:false})
+       
+
+    } catch(err) {
+      console.warn(err); // standardized err.code and err.message available
+      this.setState({isLoading:false})
+      Alert.alert('Get Product', err.message);
+    }
+
+
+  }
+
+  
+
+  async componentDidMount(){
     const { navigation } = this.props
+    const value = await AsyncStorage.getItem('app_type');
+
     const questions = navigation.getParam('questions')
     if(questions.length > 0){
       this.setState({ showSwiper: true})
     }
+
+    if(value === 'paid'){
+      this.setState({ showRemoveAd: false })
+    }
+
+
+    try {
+      const result = await RNIap.initConnection();
+      console.log("Result", result)
+      this.getProduct()
+    } catch(err) {
+      console.warn(err); // standardized err.code and err.message available
+    }
   }
 
 async removeAttemptedQue(index){
+
+
   const { navigation } = this.props
   const questions = navigation.getParam('questions')
    var topicProgress = realm2.objects('topic_progress')
@@ -94,30 +162,105 @@ async removeAttemptedQue(index){
       
     }
           
-     
-   await realm4.write(() => {
-      let question =  attended_que.filter((item) => item.id === id)
-      console.log("new",question[0])
-      realm4.delete(question[0])
-      this.swiper.swipeCard()
+    try {
+      await realm4.write(() => {
+        let question =  attended_que.filter((item) => item.id === id)
+        realm4.delete(question[0])
+      })
       this.setState({ cardIndex: this.state.cardIndex + 1 })
-    })
+      if(this.state.cardIndex == this.state.array.length ){
+        this.setState({ showSwiper: false})
+      }else{
+        this.swiper.jumpToCardIndex(this.state.cardIndex)
+      }
+    } catch (error) {
+      alert(error)
+    } 
+  
   }else{
     this.setState({ showSwiper: false})
   }
  
  }
 
+ requestPurchase = async () => {
+  try {
+    const result = await  RNIap.buyProduct("com.culture.et.plaisir")
+    Alert.alert('Purchase successfully', "Transaction id:- "  + result.transactionId);
+    this.setState({showRemoveAd:false})
+    await AsyncStorage.setItem('app_type', 'paid')
+  } catch (err) {
+    console.warn(err.code, err.message);
+    Alert.alert('',err.message)
+  }
+}
 
+
+restorePurchase = async () =>{
+
+
+  var isFree = true
+
+    try {
+      const purchases = await RNIap.getAvailablePurchases();
+     console.log("restore purchases")
+      console.log(purchases)
+
+      purchases.forEach(purchase => {
+        switch (purchase.productId) {
+        case 'com.culture.et.plaisir':
+         
+           this.setState({showRemoveAd:false})
+          isFree = false
+          AsyncStorage.setItem('app_type', 'paid')
+         
+          break
+
+        }
+      })
+
+      if(isFree){
+
+         this.requestPurchase()
+      }
+
+    //  Alert.alert('Restore Successful', 'You successfully restored the following purchases: ' + restoredTitles.join(', '));
+    } catch(err) {
+      console.warn(err); // standardized err.code and err.message available
+      Alert.alert(err.message);
+      
+    }
+  
+}
+
+
+ purchaseApp() {
+
+  Alert.alert(
+    'REMOVE ADS',
+    'Remove Ads and get full access of question for all topics',
+    [
+      {text: 'Pay', onPress: () => this.requestPurchase()},
+      {
+        text: 'Restore',
+        onPress: () => this.restorePurchase(),
+        style: 'cancel',
+      },
+      {text: 'Cancel', onPress: () => console.log('OK Pressed')},
+    ],
+    {cancelable: true},
+  );
+  
+}
 
   render() {
     
 
     return (
       <ImageBackground source={HomeBg} style={styles.container}>
-        <Header showHome={true} headerText={"Settings"} navigation={this.props.navigation}/>
+        <Header showHome={true} headerText={"Paramètres"} navigation={this.props.navigation}/>
 
-
+      <ScrollView>
         {this.state.showSwiper ?  <Swiper
 
                     cards={this.state.array}
@@ -135,7 +278,7 @@ async removeAttemptedQue(index){
                     onSwiped={(cardIndex) => this.setState({ pagination: this.state.pagination+ 1  })}
                     onSwipedLeft={() => this.setState({ index: this.state.index + 1 })}
                     onSwipedRight={() => this.setState({ index: this.state.index + 1 })}
-                    cardIndex={this.state.index}
+                    cardIndex={this.state.cardIndex}
                     backgroundColor={'#fff'}
                     useViewOverflow={false}
                     stackSize= {6}>
@@ -145,25 +288,34 @@ async removeAttemptedQue(index){
                     :  
                          <Text style={{ color: "#fff", alignSelf: 'center', fontSize: 20, marginTop: 30}}>NO QUESTIONS TO RESET</Text>
        }
+
+      {
        
-       { this.state.showSwiper ? 
-       
-      
-       <TouchableOpacity onPress={() => this.removeAttemptedQue(this.state.index)} style={{ marginTop: 320, flexDirection: 'row', margin: 15, justifyContent: 'center', alignItems: 'center'}}>
+       this.state.showSwiper ?    <TouchableOpacity onPress={() => this.removeAttemptedQue(this.state.index)} style={{ marginTop: 320, flexDirection: 'row', margin: 15, justifyContent: 'center', alignItems: 'center'}}>
         
        <ImageBackground imageStyle={{ borderRadius: 0 , resizeMode: 'contain'}}
          style={styles.backgroundStyle} source={ResetButton}>
 
-       <Text style={styles.textStyle}>Reset</Text>
+       <Text style={styles.textStyle}>Réinitialiser</Text>
 
-      </ImageBackground>
+       </ImageBackground> 
 
 
-        </TouchableOpacity> : null
+     </TouchableOpacity>  : null
+      
+    
       }
 
+      { this.state.showRemoveAd ? <TouchableOpacity style={{  borderRadius: 5, marginTop: 20, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', padding: 10, backgroundColor:'#052666'}} onPress={() => this.purchaseApp()}>
+       <Text style={{ fontSize: 18, color: "#fff"}}>Enlever publicités 1$</Text>
+     </TouchableOpacity>
+      : null  }
 
-
+      <TouchableOpacity style={{ alignSelf: 'center', margin: 25 }} onPress={() => Linking.openURL('https://sites.google.com/view/culture-et-plaisir-quiz/home')}>
+       <Text style={{ color: "#fff", fontSize: 18, }}>Politique de confidentialité</Text>
+      </TouchableOpacity>
+     
+      </ScrollView>
 
       </ImageBackground>
     );

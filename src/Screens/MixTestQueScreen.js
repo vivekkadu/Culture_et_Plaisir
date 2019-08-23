@@ -12,7 +12,7 @@ import HomeBg from '../Img/main_bg.jpg'
 import ButtonBgImg from '../Img/bottom_btn_bg.png'
 import { Icon } from 'react-native-elements'
 var Realm = require('realm');
-import { Topics, Questions, TopicProgress, QueAns, AttendedMixQue } from '../Database/Schema'
+import { Topics, Questions, TopicProgress, QueAns, AttendedMixQue, AttendedMixQueAll } from '../Database/Schema'
 let realm;
 let realm2;
 let realm3;
@@ -59,6 +59,12 @@ export default class MixTestQueScreen extends Component {
         realm4 = new Realm({
           path: 'attended_mix_que.realm',
           schema: [AttendedMixQue]
+
+        })
+
+        realm5 = new Realm({
+          path: 'attended_mix_que_all.realm',
+          schema: [AttendedMixQueAll]
 
         })
 
@@ -113,7 +119,21 @@ export default class MixTestQueScreen extends Component {
         user_ans: '1'
        })
     })
-
+    realm5.write(() => {
+      realm5.create('attended_mix_questions_all' , {
+         topic_id: questions[this.state.current_que].topic_id.toString(),
+         id:  questions[this.state.current_que].id.toString()  ,
+         answer_1: questions[this.state.current_que].answer_1,
+         answer_2: questions[this.state.current_que].answer_2,
+         answer_3: questions[this.state.current_que].answer_3,
+         correct_answer: questions[this.state.current_que].correct_answer,
+         explaination: questions[this.state.current_que].explaination,
+         name: questions[this.state.current_que].name,
+         question: questions[this.state.current_que].question,
+         user_ans: '1'
+        })
+     })
+ 
 
     if(!scoreCut){
       if(questionsNav[this.state.current_que].correct_answer == "1"){
@@ -148,6 +168,21 @@ export default class MixTestQueScreen extends Component {
 
     realm4.write(() => {
       realm4.create('attended_mix_questions' , {
+        topic_id: questions[this.state.current_que].topic_id.toString(),
+        id:  questions[this.state.current_que].id.toString()  ,
+        answer_1: questions[this.state.current_que].answer_1,
+        answer_2: questions[this.state.current_que].answer_2,
+        answer_3: questions[this.state.current_que].answer_3,
+        correct_answer: questions[this.state.current_que].correct_answer,
+        explaination: questions[this.state.current_que].explaination,
+        name: questions[this.state.current_que].name,
+        question: questions[this.state.current_que].question,
+        user_ans: '2'
+        })
+     })
+
+     realm5.write(() => {
+      realm5.create('attended_mix_questions_all' , {
         topic_id: questions[this.state.current_que].topic_id.toString(),
         id:  questions[this.state.current_que].id.toString()  ,
         answer_1: questions[this.state.current_que].answer_1,
@@ -209,7 +244,21 @@ export default class MixTestQueScreen extends Component {
        user_ans: '3'
        })
     })
-
+    realm5.write(() => {
+      realm5.create('attended_mix_questions_all' , {
+        topic_id: questions[this.state.current_que].topic_id.toString(),
+        id:  questions[this.state.current_que].id.toString()  ,
+        answer_1: questions[this.state.current_que].answer_1,
+        answer_2: questions[this.state.current_que].answer_2,
+        answer_3: questions[this.state.current_que].answer_3,
+        correct_answer: questions[this.state.current_que].correct_answer,
+        explaination: questions[this.state.current_que].explaination,
+        name: questions[this.state.current_que].name,
+        question: questions[this.state.current_que].question,
+        user_ans: '3'
+        })
+     })
+ 
 
         if(!scoreCut){
           if(questionsNav[this.state.current_que].correct_answer == "3"){
