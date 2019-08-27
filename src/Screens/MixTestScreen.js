@@ -13,7 +13,7 @@ import BottomTabComponent from '../components/BottomTabComponent'
 import Header from '../components/Header'
 import SliderThumbImg from '../Img/progress_bar_btn.png'
 import axios from 'axios'
-import { Topics, Questions, TopicProgress, QueAns, AttendedMixQue, AttendedQue } from '../Database/Schema'
+import { Topics, Questions, TopicProgress, QueAns, AttendedMixQue, AttendedQue , AttendedMixQueAll} from '../Database/Schema'
 import { Slider } from 'react-native-elements';
 import ButtonBgImg from '../Img/bottom_btn_bg.png'
 import  _ from 'lodash'
@@ -38,13 +38,20 @@ export default class MixTestScreen extends Component {
      schema: [AttendedQue]
      })
 
+     realm6 = new Realm({
+      path: 'attended_mix_que_all.realm',
+      schema: [AttendedMixQueAll]
+
+    })
+
+
  }
 
   render() {
     const { navigation } = this.props
     const allQuestion = navigation.getParam('allQuestion')
     var mixQue = realm4.objects('attended_mix_questions')
-    var attended_que = realm5.objects('attended_questions')
+    var attended_que = realm6.objects('attended_mix_questions_all')
 
       const questionsWithoutMix = allQuestion.filter(function(objFromA) {
                 return !mixQue.find(function(objFromB) {
@@ -80,7 +87,7 @@ export default class MixTestScreen extends Component {
          onValueChange={(value) => this.setState({ value: value })}
          thumbStyle={{ backgroundColor: '#2B57B7', borderColor: "#D4D4D4", borderWidth: 3, height: 40, width: 40, borderRadius: 20}}
          trackStyle={{ height: 12, margin: 10, borderRadius: 5 }}
-         maximumValue={allQuestion.length }
+         maximumValue={questions.length }
          thumbTintColor={"#2B57B7"}
        />
 

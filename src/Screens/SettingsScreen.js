@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import Header from '../components/Header'
 import HomeBg from '../Img/main_bg.jpg'
-import { Topics, Questions, TopicProgress, QueAns, AttendedMixQue , AttendedQue} from '../Database/Schema'
+import { Topics, Questions, TopicProgress, QueAns, AttendedMixQue , AttendedQue, AttendedMixQueAll} from '../Database/Schema'
 import ResetButton from '../Img/button_grey.png'
 import BackButton from '../Img/button_blue.png'
 import Swiper from 'react-native-deck-swiper'
@@ -80,6 +80,11 @@ export default class SettingsScreen extends Component {
       schema: [AttendedQue]
       })
 
+      realm6 = new Realm({
+        path: 'attended_mix_que_all.realm',
+        schema: [AttendedMixQueAll]
+
+      })
     
   }
 
@@ -195,7 +200,104 @@ async removeAttemptedQue(index){
   }
 }
 
+removeAllQue(){
 
+
+  realm2.write(() =>  {
+    realm2.deleteAll()
+  })
+  realm4.write(() =>  {
+    realm4.deleteAll()
+  })
+
+
+  realm6.write(() => {
+    realm6.deleteAll()
+  })
+
+  
+  realm2.write(() => {
+    realm2.create('topic_progress', {
+         topic_id: "1" ,
+          question_attempt:  0
+        })
+    })
+
+    realm2.write(() => {
+      realm2.create('topic_progress', {
+           topic_id: "2" ,
+            question_attempt:  0
+          })
+      })
+
+      realm2.write(() => {
+        realm2.create('topic_progress', {
+             topic_id: "3" ,
+              question_attempt:  0
+            })
+        })
+
+        realm2.write(() => {
+          realm2.create('topic_progress', {
+               topic_id: "4" ,
+                question_attempt:  0
+              })
+          })
+
+          realm2.write(() => {
+            realm2.create('topic_progress', {
+                 topic_id: "5" ,
+                  question_attempt:  0
+                })
+            })
+
+            realm2.write(() => {
+              realm2.create('topic_progress', {
+                   topic_id: "6" ,
+                    question_attempt:  0
+                  })
+              })
+
+
+              realm2.write(() => {
+                realm2.create('topic_progress', {
+                     topic_id: "7" ,
+                      question_attempt:  0
+                    })
+                })
+
+                realm2.write(() => {
+                  realm2.create('topic_progress', {
+                       topic_id: "8" ,
+                        question_attempt:  0
+                      })
+                  })
+
+                  realm2.write(() => {
+                    realm2.create('topic_progress', {
+                         topic_id: "9" ,
+                          question_attempt:  0
+                        })
+                    })
+
+                    realm2.write(() => {
+                      realm2.create('topic_progress', {
+                           topic_id: "10" ,
+                            question_attempt:  0
+                          })
+                      })
+
+                      realm2.write(() => {
+                        realm2.create('topic_progress', {
+                             topic_id: "11" ,
+                              question_attempt:  0
+                            })
+                        })
+
+
+ 
+  this.setState({ showSwiper: false })
+}
 restorePurchase = async () =>{
 
 
@@ -240,13 +342,13 @@ restorePurchase = async () =>{
     'REMOVE ADS',
     'Remove Ads and get full access of question for all topics',
     [
-      {text: 'Pay', onPress: () => this.requestPurchase()},
+      {text: 'Acheter', onPress: () => this.requestPurchase()},
       {
-        text: 'Restore',
+        text: 'Réinitialiser',
         onPress: () => this.restorePurchase(),
         style: 'cancel',
       },
-      {text: 'Cancel', onPress: () => console.log('OK Pressed')},
+      {text: 'Annuler', onPress: () => console.log('OK Pressed')},
     ],
     {cancelable: true},
   );
@@ -260,7 +362,7 @@ restorePurchase = async () =>{
       <ImageBackground source={HomeBg} style={styles.container}>
         <Header showHome={true} headerText={"Paramètres"} navigation={this.props.navigation}/>
 
-      <ScrollView>
+      <ScrollView style={{ flex: 1 }}>
         {this.state.showSwiper ?  <Swiper
 
                     cards={this.state.array}
@@ -291,20 +393,39 @@ restorePurchase = async () =>{
 
       {
        
-       this.state.showSwiper ?    <TouchableOpacity onPress={() => this.removeAttemptedQue(this.state.index)} style={{ marginTop: 320, flexDirection: 'row', margin: 15, justifyContent: 'center', alignItems: 'center'}}>
+       this.state.showSwiper ? <View style={{ flexDirection: 'row', justifyContent: 'space-around', margin: 20}}>
+         <TouchableOpacity onPress={() => this.removeAttemptedQue(this.state.index)} style={{ marginTop: 320, flexDirection: 'row', margin: 15, justifyContent: 'center', alignItems: 'center'}}>
         
-       <ImageBackground imageStyle={{ borderRadius: 0 , resizeMode: 'contain'}}
-         style={styles.backgroundStyle} source={ResetButton}>
+        <ImageBackground imageStyle={{ borderRadius: 0 , resizeMode: 'contain'}}
+          style={styles.backgroundStyle} source={ResetButton}>
+ 
+        <Text style={styles.textStyle}>Réinitialiser</Text>
+ 
+        </ImageBackground> 
+ 
+ 
+         </TouchableOpacity>
 
-       <Text style={styles.textStyle}>Réinitialiser</Text>
+         <TouchableOpacity onPress={() => this.removeAllQue(this.state.index)} style={{ marginTop: 320, flexDirection: 'row', margin: 15, justifyContent: 'center', alignItems: 'center'}}>
+        
+        <ImageBackground imageStyle={{ borderRadius: 0 , resizeMode: 'contain'}}
+          style={styles.backgroundStyle} source={ResetButton}>
+ 
+        <Text style={styles.textStyle}>Effacer tout</Text>
+ 
+        </ImageBackground> 
+ 
+ 
+         </TouchableOpacity>
 
-       </ImageBackground> 
-
-
-     </TouchableOpacity>  : null
+       
+       </View>    : null
       
     
       }
+
+
+
 
       { this.state.showRemoveAd ? <TouchableOpacity style={{  borderRadius: 5, marginTop: 20, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', padding: 10, backgroundColor:'#052666'}} onPress={() => this.purchaseApp()}>
        <Text style={{ fontSize: 18, color: "#fff"}}>Enlever publicités 1$</Text>

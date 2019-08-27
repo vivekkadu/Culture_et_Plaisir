@@ -25,6 +25,26 @@ let realm;
 let realm2;
 let realm3;
 
+const iosConfig = {
+  clientId: '510112600118-hd94457u9ruvtii3rr4rh3u197pk320o.apps.googleusercontent.com',
+  appId: '1:510112600118:ios:2f3b57a95b61fe21',
+  apiKey: 'AIzaSyDXbbE6aOHsiKnQYxE47WssDJ0zV1SB0es',
+  databaseURL: 'https://culture-et-plaisir.firebaseio.com',
+  storageBucket: 'culture-et-plaisir.appspot.com',
+  messagingSenderId: 'x',
+  projectId: 'culture-et-plaisir',
+  persistence: true,
+};
+
+const androidConfig = {
+  clientId: '510112600118-7nqobvo4gcn793qu7kp8l4t1jp65tfvf.apps.googleusercontent.com',
+  appId: '510112600118',
+  apiKey: 'AIzaSyCIgEdbotHFOZu1uJLETo3n0A0CBQznwp8',
+  databaseURL: '"https://culture-et-plaisir.firebaseio.com',
+  storageBucket: 'culture-et-plaisir.appspot.com',
+  projectId: 'culture-et-plaisir',
+  persistence: true,
+};
 
 
 class HomeScreen extends Component {
@@ -72,17 +92,17 @@ class HomeScreen extends Component {
     schema: [AttendedQue]
     })
 
-  
+    this.didFocus = props.navigation.addListener('didFocus', payload =>
+    this.loadProgress()
+  );
    this.didFocus = props.navigation.addListener('didFocus', payload =>
        this.loadTotal(),
      );
-  this.didFocus = props.navigation.addListener('didFocus', payload =>
-      this.loadProgress()
-    );
+  
     this.didFocus = props.navigation.addListener('didFocus', payload =>
       this.checkAys()
     );
-
+   
     // this.didFocus = props.navigation.addListener('didFocus', payload =>
     //   this.loadFullAd()
     // );
@@ -104,11 +124,12 @@ class HomeScreen extends Component {
   this.loadNextQuestions()
   this.checkAys()
 
+  firebase.initializeApp(
+    Platform.OS === 'ios' ? iosConfig : androidConfig,
+  );
+
 }
 
-componentWillReceiveProps(){
-  this.loadProgress()
-}
 
 componentWillUnmount() {
     this.didFocus.remove();
@@ -126,8 +147,11 @@ componentWillUnmount() {
   }
 
 
-loadNextTopics(){
+ async loadNextTopics(){
     var topic = realm.objects('topic')
+    const value = await AsyncStorage.getItem('app_type');
+
+    if(value == "paid"){
 
      if(topic.length > 0){
       var offsetValue = _.last(topic).id
@@ -151,37 +175,42 @@ loadNextTopics(){
         console.log("OFFSET TOPICS", response.data)
       })
      }
+    }
   }
 
-  loadNextQuestions(){
+  async loadNextQuestions(){
     var questions = realm3.objects('questions')
+    const value = await AsyncStorage.getItem('app_type');
 
-    if(questions.length > 0){
-      var offsetValue = _.last(questions).id
-     axios.get(`http://112.196.16.90:8080/Culture/api/get_next_questions?offset=${offsetValue}`)
-     .then((response)=> {
-       if(response.data.status == 200){
-          if(response.data.topics){
-            response.data.questions.map((que) => {
-              realm3.write(() => {
-                 realm3.create('questions', {
-                   id: que.id,
-                   name: que.name,
-                   topic_id: que.topic_id,
-                   question: que.question,
-                   answer_1: que.answer_1,
-                   answer_2: que.answer_2,
-                   answer_3: que.answer_3,
-                   correct_answer: que.correct_answer,
-                   explaination: que.explaination,
-                   user_ans: '0'
+    if(value == "paid"){
+      if(questions.length > 0){
+        var offsetValue = _.last(questions).id
+       axios.get(`http://112.196.16.90:8080/Culture/api/get_next_questions?offset=${offsetValue}`)
+       .then((response)=> {
+         if(response.data.status == 200){
+            if(response.data.topics){
+              response.data.questions.map((que) => {
+                realm3.write(() => {
+                   realm3.create('questions', {
+                     id: que.id,
+                     name: que.name,
+                     topic_id: que.topic_id,
+                     question: que.question,
+                     answer_1: que.answer_1,
+                     answer_2: que.answer_2,
+                     answer_3: que.answer_3,
+                     correct_answer: que.correct_answer,
+                     explaination: que.explaination,
+                     user_ans: '0'
+                     })
                    })
-                 })
-            })
-          }
-       }
-       console.log("New Questions", response.data)
-     })
+              })
+            }
+         }
+         console.log("New Questions", response.data)
+       })
+      }
+
     }
   }
 
@@ -193,7 +222,7 @@ loadNextTopics(){
 
     if(questions.length > 0){
       if(value === null || value === 'free' ){
-        this.setState({ allQuestion: questions.slice(0,300), isFetchingAllQue: false, app_type: 'free' })
+        this.setState({ allQuestion: questions.slice(0,200), isFetchingAllQue: false, app_type: 'free' })
       }else  if(value === 'paid'){
         this.setState({ allQuestion: questions, isFetchingAllQue: false, app_type: 'paid' })
       }
@@ -201,7 +230,7 @@ loadNextTopics(){
       axios.get("http://112.196.16.90:8080/Culture/api/get_all_questions")
        .then((response)  => {
         if(value === null ){
-          this.setState({ allQuestion: response.data.questions.slice(0,300), isFetchingAllQue: false,  app_type: 'free'  })
+          this.setState({ allQuestion: response.data.questions.slice(0,200), isFetchingAllQue: false,  app_type: 'free'  })
         }else if(value === 'paid'){
           this.setState({ allQuestion: response.data.questions, isFetchingAllQue: false,  app_type: 'paid' })
         }
@@ -235,6 +264,7 @@ async loadProgress(){
           var topicProgressData = topicProgress.filter((item) => item.topic_id == topic.id)
 
           var progress = topicProgressData.map((item) => item.question_attempt)
+          
           const value = await AsyncStorage.getItem('app_type');
 
 
@@ -331,9 +361,6 @@ async loadProgress(){
               // }
   
               this.setState({progressArray: a });
-
-
-              
 
               
   
@@ -436,11 +463,12 @@ loadFullAd(){
     ad.loadAd(request.build());
 
     ad.on('onAdLoaded', () => {
-      console.log('Advert ready to show.');
+     console.log('Advert ready to show.');
+    
       ad.show()
     });
 
-     ad.on('onAdFailedToLoad', (e) => { console.log(e) } )
+     ad.on('onAdFailedToLoad', (e) => { console.log("Error", e) } )
 
    
 }

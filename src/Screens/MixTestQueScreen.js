@@ -100,6 +100,10 @@ export default class MixTestQueScreen extends Component {
     const questionsNav = navigation.getParam('questions')
     const topic = navigation.getParam('topic')
     const questions = navigation.getParam('questions')
+    const questionlimit = navigation.getParam('questionlimit')
+    const lastQueIndex = questionlimit - this.state.current_que
+
+
 
     this.setState({optionBackground1: "#000", optionBackground2: "#052666", optionBackground3: "#052666"})
 
@@ -137,9 +141,17 @@ export default class MixTestQueScreen extends Component {
 
     if(!scoreCut){
       if(questionsNav[this.state.current_que].correct_answer == "1"){
-          this.setState({ score: this.state.score + 1, correct_answers: [...this.state.correct_answers, questionsNav[this.state.current_que]] })
+          this.setState({ score: this.state.score + 1, correct_answers: [...this.state.correct_answers, questionsNav[this.state.current_que]] }, () => {
+            if(lastQueIndex  == 1){
+              this.closePress()
+            }
+          })
       }else{
-        this.setState({ wrong_answers: [...this.state.wrong_answers, questionsNav[this.state.current_que]] })
+        this.setState({ wrong_answers: [...this.state.wrong_answers, questionsNav[this.state.current_que]] }, () => {
+          if(lastQueIndex  == 1){
+            this.closePress()
+          }
+        })
       }
     }
     await realm3.write(() => {
@@ -163,6 +175,9 @@ export default class MixTestQueScreen extends Component {
     const questionsNav = navigation.getParam('questions')
     const topic = navigation.getParam('topic')
     const questions = navigation.getParam('questions')
+    const questionlimit = navigation.getParam('questionlimit')
+    const lastQueIndex = questionlimit - this.state.current_que
+
     this.setState({optionBackground2: "#000", optionBackground1: "#052666", optionBackground3: "#052666"})
     this.setState({ attended_questions: [...this.state.attended_questions, questions[this.state.current_que]], selectedAns: 2, })
 
@@ -199,9 +214,17 @@ export default class MixTestQueScreen extends Component {
 
          if(!scoreCut){
            if(questionsNav[this.state.current_que].correct_answer == "2"){
-               this.setState({ score: this.state.score + 1, correct_answers: [...this.state.correct_answers, questionsNav[this.state.current_que]] })
+               this.setState({ score: this.state.score + 1, correct_answers: [...this.state.correct_answers, questionsNav[this.state.current_que]] }, () => {
+                if(lastQueIndex  == 1){
+                  this.closePress()
+                }
+               })
            }else{
-             this.setState({ wrong_answers: [...this.state.wrong_answers, questionsNav[this.state.current_que]] })
+             this.setState({ wrong_answers: [...this.state.wrong_answers, questionsNav[this.state.current_que]] }, () => {
+              if(lastQueIndex  == 1){
+                this.closePress()
+              }
+             })
            }
          }
          await realm3.write(() => {
@@ -223,6 +246,9 @@ export default class MixTestQueScreen extends Component {
     const questionsNav = navigation.getParam('questions')
     const topic = navigation.getParam('topic')
     const questions = navigation.getParam('questions')
+    const questionlimit = navigation.getParam('questionlimit')
+    const lastQueIndex = questionlimit - this.state.current_que
+
     this.setState({optionBackground3: "#000", optionBackground1: "#052666", optionBackground2: "#052666"})
 
 
@@ -262,9 +288,17 @@ export default class MixTestQueScreen extends Component {
 
         if(!scoreCut){
           if(questionsNav[this.state.current_que].correct_answer == "3"){
-              this.setState({ score: this.state.score + 1, correct_answers: [...this.state.correct_answers, questionsNav[this.state.current_que]] })
+              this.setState({ score: this.state.score + 1, correct_answers: [...this.state.correct_answers, questionsNav[this.state.current_que]] } , () => {
+                if(lastQueIndex  == 1){
+                  this.closePress()
+                }
+              })
           }else{
-            this.setState({ wrong_answers: [...this.state.wrong_answers, questionsNav[this.state.current_que]] })
+            this.setState({ wrong_answers: [...this.state.wrong_answers, questionsNav[this.state.current_que]] }, () => {
+              if(lastQueIndex  == 1){
+                this.closePress()
+              }
+            })
           }
         }
         await realm3.write(() => {

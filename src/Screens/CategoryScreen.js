@@ -21,7 +21,7 @@ import axios from 'axios'
 import { Slider } from 'react-native-elements';
 import Spinner from '../components/Spinner';
 var Realm = require('realm');
-import { Topics, Questions,QueAns,TopicProgress, AttendedMixQue, AttendedMixQueAll } from '../Database/Schema'
+import { Topics, Questions,QueAns,TopicProgress, AttendedMixQue, AttendedMixQueAll, AttendedQue } from '../Database/Schema'
 let realm;
 let realm2;
 let realm4;
@@ -67,6 +67,12 @@ export default class CategoryScreen extends Component {
 
       })
 
+
+    realm6 = new Realm({
+      path: "attended_que.realm",
+      schema: [AttendedQue]
+    });
+
  }
 
 
@@ -77,36 +83,59 @@ export default class CategoryScreen extends Component {
        const topic = navigation.getParam('topic')
        const value = await AsyncStorage.getItem('app_type');
 
-       if(value === null){
+       if(value === null || value === "free"  ){
         this.setState({ app_type: 'free'})
+
        }else if(value === 'paid'){
         this.setState({ app_type: 'paid'})
        }
-
        var questions = realm.objects('questions')
+
 
        console.log("questions",questions)
 
-       var mixQue = realm5.objects('attended_mix_questions_all')
-       var mixQueTopic = mixQue.filter((item) => item.topic_id === topic.id )
+       var mixQue = realm5.objects('attended_mix_questions_all')  //mix questions
+
+       var attended_que = realm4.objects('attended_mix_questions')   //topic realted que
+ 
+
+       var mixQueTopic = mixQue.filter((item) => item.topic_id === topic.id ) // topic question which are solved in mix
+
+       var attended_que_topic = attended_que.filter((item)=> item.topic_id === topic.id ) // topic question which are solved
 
 
        this.setState({ mixQue: mixQueTopic.length  })
 
-        var filterData = questions.filter((item) => item.topic_id == topic.id)
+       
+       if(value === null || value === "free"  ){
+        var topicQue = questions.filter((item) => item.topic_id == topic.id).slice(0,20)
 
-        var RealQue = filterData.filter(function(objFromA) {
+       }else if(value === 'paid'){
+        var topicQue = questions.filter((item) => item.topic_id == topic.id)
+      }
+
+      
+
+       var removeTopicAttendedQue =  topicQue.filter(function(objFromA) {
+        return !attended_que_topic.find(function(objFromB) {
+          return objFromA.id === objFromB.id
+          })
+         })
+
+        var removeMixAttendedQue = removeTopicAttendedQue.filter(function(objFromA) {
           return !mixQueTopic.find(function(objFromB) {
             return objFromA.id === objFromB.id
+            })
            })
-        })
 
 
-        if(filterData.length > 0){
+          
+
+        if(topicQue.length > 0){
           if(value === null ){
-            this.setState({ questions: RealQue.slice(0,30), isLoading: false })
+            this.setState({ questions: removeMixAttendedQue, isLoading: false })
           }else if(value === 'paid'){
-            this.setState({ questions: RealQue, isLoading: false })
+            this.setState({ questions: removeMixAttendedQue, isLoading: false })
           }
         }else{
           axios.get("http://112.196.16.90:8080/Culture/api/get_topics_questions/")
@@ -115,7 +144,7 @@ export default class CategoryScreen extends Component {
                  this.setState({ topics: response.data.topics , isLoading: false})
                  let currentTopic = response.data.topics.filter((item) => item.id == topic.id)
                  if(value === null || value === 'free' ){
-                  this.setState({ questions: currentTopic[0].questions.slice(0,30), isLoading: false })
+                  this.setState({ questions: currentTopic[0].questions.slice(0,20), isLoading: false })
                 }else if(value === 'paid'){
                   this.setState({ questions: currentTopic[0].questions, isLoading: false })
                 }
@@ -156,7 +185,7 @@ export default class CategoryScreen extends Component {
          }
 
          if(value === null || value === 'free'){
-           if(this.state.solvedQue === 30){
+           if(this.state.solvedQue === 20){
              this.setState({ hideSlider: true })
            }
          }
@@ -197,17 +226,22 @@ export default class CategoryScreen extends Component {
 
 
                    <ImageBackground source={TotalBg} style={{ marginTop: 25, margin: 10, padding: 10, justifyContent: 'center', alignItems: 'center'}}>
+                    
                     <Text style={{ color: '#fff', fontWeight: 'bold', marginBottom: 5}}>Questions Posées dans le texte mixte {this.state.mixQue} </Text>
-                    <Text style={{ color: "#fff", fontSize: 24, fontWeight: 'bold'}}>Questions Totales {(this.state.questions.length)  - (this.state.solvedQue || 0) } </Text>
+                   
+                    {
+                      (this.state.solvedQue + this.state.mixQue) >= this.state.questions.length ?  <Text style={{ color: "#fff", fontSize: 24, fontWeight: 'bold'}}>Questions Totales 0 </Text> :  <Text style={{ color: "#fff", fontSize: 24, fontWeight: 'bold'}}>Questions Totales {(this.state.questions.length)}</Text>
+                    }
+                 
                   </ImageBackground>
 
 
                  <Text style={{ marginTop: "7%",  alignSelf: 'center', color : "#fff", fontSize: 16}}>Choisir le nombre de questions: {this.state.value - this.state.solvedQue < 0 ?  0 : this.state.value - (this.state.solvedQue || 0) }</Text>
 
 
-               <View style={{ marginTop: "5%"}}>
+               <View style={{ marginTop: "2%",}}>
 
-                 {(this.state.solvedQue >= 30 && this.state.app_type === "free") || (this.state.solvedQue >= this.state.questions.length && this.state.app_type === "paid") ? <Text style={{ color: '#fff', alignSelf: 'center', fontSize: 16, marginTop: 5, margin: 5, textAlign: 'center' }}>Ont répondu à toutes les questions sur le sujet</Text> :  <Slider
+                 {((this.state.solvedQue + this.state.mixQue) >= 20 && this.state.app_type === "free") || (this.state.solvedQue >= this.state.questions.length && this.state.app_type === "paid") ? <Text style={{ color: '#fff', alignSelf: 'center', fontSize: 16, marginTop: 5, margin: 5, marginBottom: 20, textAlign: 'center' }}>Ont répondu à toutes les questions sur le sujet</Text> :  <Slider
                     value ={this.state.value}
                       minimumTrackTintColor={"#2B57B7"}
                       maximumTrackTintColor={"#fff"}
@@ -217,7 +251,7 @@ export default class CategoryScreen extends Component {
                       onValueChange={(value) => this.setState({ value: value })}
                       thumbStyle={{ backgroundColor: '#2B57B7', borderColor: "#D4D4D4", borderWidth: 3, height: 40, width: 40, borderRadius: 20}}
                       trackStyle={{ height: 12, margin: 10, borderRadius: 5 }}
-                      maximumValue={this.state.questions.length }
+                      maximumValue={(this.state.questions.length)}
                       thumbTintColor={"#2B57B7"}
                     /> }
 
